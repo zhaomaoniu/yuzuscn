@@ -1,0 +1,9 @@
+[project]
+name = "yuzuscn"
+version = "0.1.0"
+description = "A simple and easy-to-use editor for viewing and modifying SCN files from Yuzusoft visual novels."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.11.3",
+]

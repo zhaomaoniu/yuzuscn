@@ -257,3 +257,23 @@ class Scene(BaseModel):
     For real scenes, this may be a list of titles for each language.
     """
     version: int
+
+    @model_serializer(mode="wrap")
+    def dump_without_none(self, handler):
+        return {
+            k: getattr(self, k)
+            for k in [
+                "firstLine",
+                "jumplabels",
+                "label",
+                "lines",
+                "nexts",
+                "preevals",
+                "postevals",
+                "spCount",
+                "texts",
+                "title",
+                "version",
+            ]
+            if getattr(self, k) is not None
+        }

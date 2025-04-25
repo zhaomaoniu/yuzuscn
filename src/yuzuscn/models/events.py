@@ -230,7 +230,9 @@ class StartlineEvent(BaseModel):
 class EnvUpdateEvent(BaseModel):
     """Environment update event model for Yuzu SCN files."""
 
+    pretrans: Optional[List[Instruction]] = None
     update: List[Union[Instruction, DataItemDetails]]
+    revpretrans: Optional[List[Instruction]] = None
     revupdate: Optional[List[Union[Instruction, DataItemDetails]]] = None
     wait: Optional[Wait] = None
     trans: Optional[Transform] = None
@@ -239,8 +241,6 @@ class EnvUpdateEvent(BaseModel):
     `0`: On  
     `1`: Off
     """
-    pretrans: Optional[List[Instruction]] = None
-    revpretrans: Optional[List[Instruction]] = None
 
     @model_validator(mode="before")
     @classmethod
@@ -276,7 +276,16 @@ class EnvUpdateEvent(BaseModel):
     @model_serializer(mode="wrap")
     def dump_as_list(self, handler):
         result = ["envupdate"]
-        for key, value in self.model_dump().items():
+        for key in [
+            "pretrans",
+            "update",
+            "revpretrans",
+            "revupdate",
+            "wait",
+            "trans",
+            "msgoff",
+        ]:
+            value = getattr(self, key)
             if value is not None:
                 result.extend([key, value])
         return result
@@ -322,8 +331,9 @@ class DelayRunEvent(BaseModel):
     @model_serializer(mode="wrap")
     def dump_as_list(self, handler):
         result = ["delayrun", self.label, self.delay_event_type]
-        for key, value in self.model_dump().items():
-            if value is not None and key not in ("label", "delay_event_type"):
+        for key in ["update", "revupdate", "trans"]:
+            value = getattr(self, key)
+            if value is not None:
                 result.extend([key, value])
         return result
 
@@ -712,7 +722,8 @@ class ExitEvent(BaseModel):
             self.storage,
             "target",
             self.target,
-            self.value,
+            "eval",
+            self.eval,
         ]
 
 
@@ -853,13 +864,13 @@ class Event(
             QuickMenuEvent,
             ErEvent,
             EndRecollectionEvent,
-            FallbackEvent,
             PlayVoiceEvent,
             StopVoiceEvent,
             ExitEvent,
             BeginSkipEvent,
             EndSkipEvent,
             SysVoiceEvent,
+            FallbackEvent,
         ]
     ]
 ):

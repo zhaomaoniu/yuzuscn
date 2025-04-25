@@ -362,8 +362,8 @@ class ShowDate(BaseModel):
 class Env(BaseModel):
     """Represents the environment object in the snapshot point line."""
 
-    name: str
     action: Optional[List[Optional[str]]] = None  # Seen in one envupdate
+    name: str
 
     model_config = ConfigDict(
         extra="allow",
